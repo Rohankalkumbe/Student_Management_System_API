@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: student-management-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      # Set this in the Render dashboard. Do not commit database credentials.
+      - key: ConnectionStrings__DefaultConnection
+        sync: false

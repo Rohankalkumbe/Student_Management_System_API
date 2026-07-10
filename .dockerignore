@@ -1,0 +1,18 @@
+# Source-control and IDE metadata
+.git/
+.github/
+.vs/
+.agents/
+
+# Build artifacts
+bin/
+obj/
+
+# Local configuration and logs
+.env
+*.log
+
+# Docker artifacts
+Dockerfile*
+docker-compose*
+!Dockerfile

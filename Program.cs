@@ -3,6 +3,15 @@ using StudentManagementSystem.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Render supplies the HTTP port through the PORT environment variable.
+// This keeps local development settings unchanged while allowing the container
+// to listen on the port assigned by the platform.
+var renderPort = Environment.GetEnvironmentVariable("PORT");
+if (int.TryParse(renderPort, out var port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllers();
@@ -42,6 +51,7 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseHttpsRedirection();
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 app.MapControllers();
 
 app.Run();
