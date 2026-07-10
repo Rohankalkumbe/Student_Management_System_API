@@ -21,7 +21,28 @@ Open Swagger at `http://localhost:8080/swagger` and the health check at
    Service and select the Docker runtime).
 3. Set the `ConnectionStrings__DefaultConnection` environment variable in the
    Render dashboard to a connection string for a reachable SQL Server database.
-4. Deploy. Render provides `PORT`; the API automatically listens on it.
+   For Azure SQL, use for example:
+
+   ```text
+   Server=tcp=<server>.database.windows.net,1433;Initial Catalog=<database>;User ID=<user>;Password=<password>;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+   ```
+
+   Ensure the database firewall permits connections from Render. Do not use the
+   local `(localdb)` connection string in Render.
+4. Deploy. Startup runs `Database.Migrate()`, which creates the `Students`
+   table and applies all pending EF Core migrations. A migration failure is
+   logged and intentionally fails the deployment rather than allowing requests
+   to return a hidden 500 error.
+
+To apply migrations manually from a machine that has access to the production
+database, set the same environment variable and run:
+
+```bash
+dotnet ef database update --configuration Release
+```
+
+After deployment, `GET /health/database` returns the number of rows in the
+`Students` table, and `GET /api/Students` returns those records.
 
 LocalDB (`(localdb)\\MSSQLLocalDB`) works only on a local Windows machine, so it
 cannot be used from Render. Use a hosted SQL Server provider (for example Azure
