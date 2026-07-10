@@ -1,13 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using StudentManagementSystem.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Render supplies the HTTP port through the PORT environment variable.
-// This keeps local development settings unchanged while allowing the container
-// to listen on the port assigned by the platform.
 var renderPort = Environment.GetEnvironmentVariable("PORT");
 if (int.TryParse(renderPort, out var port))
 {
@@ -40,10 +37,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Run CORS before the exception handler so browser clients can read structured
-// error responses as well as successful API responses.
 app.UseCors("Frontend");
-
 app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
 {
     var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
@@ -62,6 +56,7 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
         extensions: new Dictionary<string, object?> { ["traceId"] = context.TraceIdentifier })
         .ExecuteAsync(context);
 }));
+app.UseCors("Frontend");
 
 using (var scope = app.Services.CreateScope())
 {
