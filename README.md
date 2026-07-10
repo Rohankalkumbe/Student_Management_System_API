@@ -41,9 +41,6 @@ database, set the same environment variable and run:
 dotnet ef database update --configuration Release
 ```
 
-After deployment, `GET /health/database` returns the number of rows in the
-`Students` table, and `GET /api/Students` returns those records.
-
 LocalDB (`(localdb)\\MSSQLLocalDB`) works only on a local Windows machine, so it
 cannot be used from Render. Use a hosted SQL Server provider (for example Azure
 SQL) and keep its credentials only in Render's environment settings.

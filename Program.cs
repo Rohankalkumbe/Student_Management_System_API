@@ -88,11 +88,6 @@ app.UseSwaggerUI(options =>
 
 app.UseHttpsRedirection();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
-app.MapGet("/health/database", async (ApplicationDbContext database, CancellationToken cancellationToken) =>
-{
-    var studentCount = await database.Students.CountAsync(cancellationToken);
-    return Results.Ok(new { status = "healthy", students = studentCount });
-});
 app.MapControllers();
 
 app.Run();
