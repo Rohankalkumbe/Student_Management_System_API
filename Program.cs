@@ -5,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -13,11 +12,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-    {
         policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 });
 
 var app = builder.Build();
@@ -28,23 +25,23 @@ using (var scope = app.Services.CreateScope())
 {
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        db.Database.Migrate();
+        var database = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        database.Database.Migrate();
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"DB Migration Error: {ex.Message}");
+        app.Logger.LogError(ex, "Database migration failed.");
     }
 }
 
-// ✅ Swagger always enabled with correct route
 app.UseSwagger();
-app.UseSwaggerUI(c =>
+app.UseSwaggerUI(options =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Student API V1");
-    c.RoutePrefix = "swagger"; // ← fixes 404
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Student API V1");
+    options.RoutePrefix = "swagger";
 });
 
 app.UseHttpsRedirection();
 app.MapControllers();
+
 app.Run();
