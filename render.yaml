@@ -3,7 +3,6 @@ services:
     name: student-management-api
     runtime: docker
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /health
     autoDeployTrigger: commit
     envVars:
       - key: ASPNETCORE_ENVIRONMENT

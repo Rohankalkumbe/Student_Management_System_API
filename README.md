@@ -11,8 +11,7 @@ docker run --rm -p 8080:8080 \
   student-management-api
 ```
 
-Open Swagger at `http://localhost:8080/swagger` and the health check at
-`http://localhost:8080/health`.
+Open Swagger at `http://localhost:8080/swagger`.
 
 ## Deploy on Render
 
