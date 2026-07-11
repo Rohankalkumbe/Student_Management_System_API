@@ -1,12 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudentManagementSystem.Models;
 
-namespace StudentManagementSystem.Data
-{
-    public class ApplicationDbContext : DbContext
-    {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+namespace StudentManagementSystem.Data;
 
-        public DbSet<Student> Students { get; set; }
-    }
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+{
+    public DbSet<Student> Students => Set<Student>();
 }

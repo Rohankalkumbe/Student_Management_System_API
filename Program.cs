@@ -56,8 +56,6 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
         extensions: new Dictionary<string, object?> { ["traceId"] = context.TraceIdentifier })
         .ExecuteAsync(context);
 }));
-app.UseCors("Frontend");
-
 using (var scope = app.Services.CreateScope())
 {
     try
