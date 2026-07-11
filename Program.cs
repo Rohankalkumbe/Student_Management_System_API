@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 var renderPort = Environment.GetEnvironmentVariable("PORT");
 if (int.TryParse(renderPort, out var port))
@@ -56,6 +57,27 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
         extensions: new Dictionary<string, object?> { ["traceId"] = context.TraceIdentifier })
         .ExecuteAsync(context);
 }));
+
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var database = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+        var collectionNames = await database.ListCollectionNames().ToListAsync();
+
+        if (!collectionNames.Contains("students", StringComparer.Ordinal))
+        {
+            await database.CreateCollectionAsync("students");
+            app.Logger.LogInformation("Created MongoDB students collection.");
+        }
+    }
+    catch (MongoException ex)
+    {
+        app.Logger.LogCritical(ex, "MongoDB initialization failed; the API will not start.");
+        throw;
+    }
+}
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
