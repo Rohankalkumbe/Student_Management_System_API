@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace StudentManagementSystem.Models;
 
 public sealed class Student
 {
+    [BsonId]
     public int Id { get; set; }
 
     [Required]

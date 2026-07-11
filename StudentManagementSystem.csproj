@@ -5,18 +5,11 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseAppHost>false</UseAppHost>
+		<UserSecretsId>student-management-system-api-2026</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.6">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.6">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
+		<PackageReference Include="MongoDB.Driver" Version="3.10.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
 	</ItemGroup>
 

@@ -1,7 +1,5 @@
-using System.Data.Common;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using StudentManagementSystem.Data;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,16 +9,18 @@ if (int.TryParse(renderPort, out var port))
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration["MongoDb:ConnectionString"];
 if (string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException(
-        "ConnectionStrings__DefaultConnection must be configured. " +
-        "Set it in Render to a reachable SQL Server/Azure SQL connection string.");
+        "MongoDb__ConnectionString must be configured. " +
+        "Set it to a reachable MongoDB connection string.");
 }
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure()));
+var databaseName = builder.Configuration["MongoDb:DatabaseName"] ?? "StudentManagementSystem";
+builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(connectionString));
+builder.Services.AddScoped(provider =>
+    provider.GetRequiredService<IMongoClient>().GetDatabase(databaseName));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -41,7 +41,7 @@ app.UseCors("Frontend");
 app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
 {
     var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-    var isDatabaseError = exception?.GetBaseException() is DbException or TimeoutException;
+    var isDatabaseError = exception?.GetBaseException() is MongoException or TimeoutException;
     var statusCode = isDatabaseError ? StatusCodes.Status503ServiceUnavailable : StatusCodes.Status500InternalServerError;
     var title = isDatabaseError ? "Database unavailable" : "Unexpected server error";
     var detail = isDatabaseError
@@ -56,22 +56,6 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
         extensions: new Dictionary<string, object?> { ["traceId"] = context.TraceIdentifier })
         .ExecuteAsync(context);
 }));
-using (var scope = app.Services.CreateScope())
-{
-    try
-    {
-        var database = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        app.Logger.LogInformation("Applying pending EF Core migrations.");
-        database.Database.Migrate();
-        app.Logger.LogInformation("EF Core migrations are up to date.");
-    }
-    catch (Exception ex)
-    {
-        app.Logger.LogCritical(ex, "Database migration failed; the API will not start.");
-        throw;
-    }
-}
-
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {

@@ -8,5 +8,5 @@ services:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       # Set this in the Render dashboard. Do not commit database credentials.
-      - key: ConnectionStrings__DefaultConnection
+      - key: MongoDb__ConnectionString
         sync: false
